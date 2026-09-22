@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JSONLens - JSON Formatter, Validator & Viewer</title>
+  <meta name="description" content="Format, validate, minify, and visualize JSON data with JSONLens. Free online JSON tool.">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <div class="header-left">
+      <h1><span class="logo-brace">{</span> JSONLens <span class="logo-brace">}</span></h1>
+      <span class="tagline">Format &middot; Validate &middot; Explore</span>
+    </div>
+    <div class="header-right">
+      <button id="themeToggle" class="icon-btn" title="Toggle theme">
+        <span class="theme-icon">&#9790;</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <div class="toolbar-group">
+      <button id="btnFormat" class="btn primary" title="Beautify JSON">Format</button>
+      <button id="btnMinify" class="btn" title="Minify JSON">Minify</button>
+      <button id="btnValidate" class="btn" title="Validate JSON">Validate</button>
+      <button id="btnTreeView" class="btn" title="Toggle tree view">Tree View</button>
+    </div>
+    <div class="toolbar-group">
+      <label for="indentSelect" class="toolbar-label">Indent:</label>
+      <select id="indentSelect" class="select">
+        <option value="2" selected>2 Spaces</option>
+        <option value="4">4 Spaces</option>
+        <option value="tab">Tab</option>
+      </select>
+    </div>
+    <div class="toolbar-group">
+      <button id="btnSample" class="btn" title="Load sample JSON">Sample</button>
+      <button id="btnClear" class="btn" title="Clear all">Clear</button>
+      <button id="btnCopy" class="btn" title="Copy output">Copy</button>
+      <button id="btnDownload" class="btn" title="Download output">Download</button>
+    </div>
+  </div>
+
+  <div class="status-bar" id="statusBar">
+    <span id="statusMessage">Paste or type JSON in the input panel</span>
+  </div>
+
+  <main class="split-pane">
+    <div class="pane input-pane">
+      <div class="pane-header">
+        <span>Input</span>
+        <span class="char-count" id="inputCount">0 chars</span>
+      </div>
+      <div class="textarea-wrapper">
+        <div class="line-numbers" id="inputLineNumbers">1</div>
+        <textarea id="jsonInput" spellcheck="false" placeholder="Paste your JSON here..."></textarea>
+      </div>
+    </div>
+
+    <div class="divider" id="divider"></div>
+
+    <div class="pane output-pane">
+      <div class="pane-header">
+        <span>Output</span>
+        <span class="char-count" id="outputCount">0 chars</span>
+      </div>
+      <div id="outputContainer" class="output-container">
+        <pre id="jsonOutput" class="output-pre"><code id="jsonOutputCode"></code></pre>
+        <div id="treeOutput" class="tree-output hidden"></div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <span>JSONLens &mdash; Free online JSON tool</span>
+  </footer>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
