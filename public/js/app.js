@@ -34,7 +34,7 @@
   }
 
   function escapeHtml(str) {
-    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return JsonUtils.escapeHtml(str);
   }
 
   function setStatus(msg, type) {
@@ -56,21 +56,7 @@
   // --- Syntax Highlighting ---
 
   function syntaxHighlight(json) {
-    const escaped = escapeHtml(json);
-    return escaped.replace(
-      /("(\\u[\da-fA-F]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?)/g,
-      (match) => {
-        let cls = 'json-number';
-        if (/^"/.test(match)) {
-          cls = /:$/.test(match) ? 'json-key' : 'json-string';
-        } else if (/true|false/.test(match)) {
-          cls = 'json-boolean';
-        } else if (/null/.test(match)) {
-          cls = 'json-null';
-        }
-        return '<span class="' + cls + '">' + match + '</span>';
-      }
-    );
+    return JsonUtils.syntaxHighlight(json);
   }
 
   // --- Core Operations ---
@@ -198,7 +184,6 @@
 
     if (data !== null && typeof data === 'object') {
       const isArray = Array.isArray(data);
-      const entries = isArray ? data : Object.entries(data);
       const count = isArray ? data.length : Object.keys(data).length;
 
       const header = document.createElement('div');

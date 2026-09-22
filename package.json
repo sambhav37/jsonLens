@@ -1,0 +1,15 @@
+{
+  "name": "jsonlens",
+  "version": "1.0.0",
+  "description": "A powerful JSON formatting and validation tool",
+  "private": true,
+  "scripts": {
+    "lint": "eslint public/js/",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "eslint": "^9.0.0",
+    "vitest": "^3.0.0"
+  }
+}
