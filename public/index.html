@@ -22,10 +22,14 @@
   </header>
 
   <div class="toolbar">
+    <div class="toolbar-group mode-toggle">
+      <button id="btnModeJSON" class="btn mode-btn active" title="JSON mode">JSON</button>
+      <button id="btnModeXML" class="btn mode-btn" title="XML mode">XML</button>
+    </div>
     <div class="toolbar-group">
-      <button id="btnFormat" class="btn primary" title="Beautify JSON">Format</button>
-      <button id="btnMinify" class="btn" title="Minify JSON">Minify</button>
-      <button id="btnValidate" class="btn" title="Validate JSON">Validate</button>
+      <button id="btnFormat" class="btn primary" title="Format">Format</button>
+      <button id="btnMinify" class="btn" title="Minify">Minify</button>
+      <button id="btnValidate" class="btn" title="Validate">Validate</button>
       <button id="btnTreeView" class="btn" title="Toggle tree view">Tree View</button>
     </div>
     <div class="toolbar-group">
@@ -37,7 +41,7 @@
       </select>
     </div>
     <div class="toolbar-group">
-      <button id="btnSample" class="btn" title="Load sample JSON">Sample</button>
+      <button id="btnSample" class="btn" title="Load sample data">Sample</button>
       <button id="btnClear" class="btn" title="Clear all">Clear</button>
       <button id="btnCopy" class="btn" title="Copy output">Copy</button>
       <button id="btnDownload" class="btn" title="Download output">Download</button>
@@ -56,7 +60,7 @@
       </div>
       <div class="textarea-wrapper">
         <div class="line-numbers" id="inputLineNumbers">1</div>
-        <textarea id="jsonInput" spellcheck="false" placeholder="Paste your JSON here..."></textarea>
+        <textarea id="jsonInput" spellcheck="false" placeholder="Paste your JSON or XML here..."></textarea>
       </div>
     </div>
 
@@ -79,6 +83,7 @@
   </footer>
 
   <script src="js/json-utils.js"></script>
+  <script src="js/xml-utils.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

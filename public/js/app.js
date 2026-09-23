@@ -23,8 +23,11 @@
   const btnCopy = document.getElementById('btnCopy');
   const btnDownload = document.getElementById('btnDownload');
   const themeToggle = document.getElementById('themeToggle');
+  const btnModeJSON = document.getElementById('btnModeJSON');
+  const btnModeXML = document.getElementById('btnModeXML');
 
   let isTreeView = false;
+  let mode = 'json';
 
   // --- Utilities ---
 
@@ -61,53 +64,57 @@
 
   // --- Core Operations ---
 
-  function formatJSON() {
+  function formatInput() {
     const raw = input.value.trim();
-    if (!raw) {
-      setStatus('Input is empty', 'warning');
-      return;
-    }
+    if (!raw) { setStatus('Input is empty', 'warning'); return; }
     try {
-      const parsed = JSON.parse(raw);
-      const formatted = JSON.stringify(parsed, null, getIndent());
-      showCodeOutput(formatted);
-      setStatus('Valid JSON - Formatted successfully', 'valid');
-    } catch (e) {
-      showError(e);
-    }
+      if (mode === 'xml') {
+        const formatted = XmlUtils.formatXML(raw, getIndent());
+        showCodeOutput(formatted);
+        setStatus('Valid XML - Formatted successfully', 'valid');
+      } else {
+        const parsed = JSON.parse(raw);
+        const formatted = JSON.stringify(parsed, null, getIndent());
+        showCodeOutput(formatted);
+        setStatus('Valid JSON - Formatted successfully', 'valid');
+      }
+    } catch (e) { showError(e); }
   }
 
-  function minifyJSON() {
+  function minifyInput() {
     const raw = input.value.trim();
-    if (!raw) {
-      setStatus('Input is empty', 'warning');
-      return;
-    }
+    if (!raw) { setStatus('Input is empty', 'warning'); return; }
     try {
-      const parsed = JSON.parse(raw);
-      const minified = JSON.stringify(parsed);
-      showCodeOutput(minified);
-      setStatus('Valid JSON - Minified (' + minified.length.toLocaleString() + ' chars)', 'valid');
-    } catch (e) {
-      showError(e);
-    }
+      if (mode === 'xml') {
+        const minified = XmlUtils.minifyXML(raw);
+        showCodeOutput(minified);
+        setStatus('Valid XML - Minified (' + minified.length.toLocaleString() + ' chars)', 'valid');
+      } else {
+        const parsed = JSON.parse(raw);
+        const minified = JSON.stringify(parsed);
+        showCodeOutput(minified);
+        setStatus('Valid JSON - Minified (' + minified.length.toLocaleString() + ' chars)', 'valid');
+      }
+    } catch (e) { showError(e); }
   }
 
-  function validateJSON() {
+  function validateInput() {
     const raw = input.value.trim();
-    if (!raw) {
-      setStatus('Input is empty', 'warning');
-      return;
-    }
+    if (!raw) { setStatus('Input is empty', 'warning'); return; }
     try {
-      const parsed = JSON.parse(raw);
-      const formatted = JSON.stringify(parsed, null, getIndent());
-      showCodeOutput(formatted);
-      const info = describeJSON(parsed);
-      setStatus('Valid JSON - ' + info, 'valid');
-    } catch (e) {
-      showError(e);
-    }
+      if (mode === 'xml') {
+        const result = XmlUtils.validateXML(raw);
+        const formatted = XmlUtils.formatXML(raw, getIndent());
+        showCodeOutput(formatted);
+        setStatus('Valid XML - ' + result.description, 'valid');
+      } else {
+        const parsed = JSON.parse(raw);
+        const formatted = JSON.stringify(parsed, null, getIndent());
+        showCodeOutput(formatted);
+        const info = describeJSON(parsed);
+        setStatus('Valid JSON - ' + info, 'valid');
+      }
+    } catch (e) { showError(e); }
   }
 
   function describeJSON(obj) {
@@ -123,7 +130,7 @@
 
   function showCodeOutput(text) {
     if (isTreeView) toggleTreeView();
-    outputCode.innerHTML = syntaxHighlight(text);
+    outputCode.innerHTML = mode === 'xml' ? XmlUtils.syntaxHighlightXML(text) : syntaxHighlight(text);
     jsonOutput.classList.remove('hidden');
     treeOutput.classList.add('hidden');
     updateCharCount(outputCount, text);
@@ -131,6 +138,7 @@
 
   function showError(e) {
     const msg = e.message;
+    const label = mode.toUpperCase();
     outputCode.innerHTML = '<span class="json-boolean">Error: ' + escapeHtml(msg) + '</span>';
     jsonOutput.classList.remove('hidden');
     treeOutput.classList.add('hidden');
@@ -140,15 +148,19 @@
       const pos = parseInt(posMatch[1], 10);
       const before = input.value.substring(0, pos);
       const line = before.split('\n').length;
-      setStatus('Invalid JSON - Error at line ' + line + ': ' + msg, 'invalid');
+      setStatus('Invalid ' + label + ' - Error at line ' + line + ': ' + msg, 'invalid');
     } else {
-      setStatus('Invalid JSON - ' + msg, 'invalid');
+      setStatus('Invalid ' + label + ' - ' + msg, 'invalid');
     }
   }
 
   // --- Tree View ---
 
   function toggleTreeView() {
+    if (mode === 'xml') {
+      setStatus('Tree view is available in JSON mode only', 'warning');
+      return;
+    }
     isTreeView = !isTreeView;
     btnTreeView.classList.toggle('primary', isTreeView);
 
@@ -342,6 +354,8 @@
     ]
   };
 
+  const sampleXML = '<?xml version="1.0" encoding="UTF-8"?>\n<application>\n<name>JSONLens</name>\n<version>1.0.0</version>\n<description>A powerful formatting and validation tool</description>\n<features>\n<feature id="1">Format</feature>\n<feature id="2">Validate</feature>\n<feature id="3">Minify</feature>\n</features>\n<settings theme="dark" indent="2" autoValidate="true"/>\n<stats users="15000" rating="4.8" isPremium="false"/>\n</application>';
+
   // --- Copy & Download ---
 
   function getOutputText() {
@@ -367,28 +381,52 @@
       setStatus('Nothing to download', 'warning');
       return;
     }
-    const blob = new Blob([text], { type: 'application/json' });
+    const mimeType = mode === 'xml' ? 'application/xml' : 'application/json';
+    const ext = mode === 'xml' ? '.xml' : '.json';
+    const blob = new Blob([text], { type: mimeType });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'jsonlens-output.json';
+    a.download = 'jsonlens-output' + ext;
     a.click();
     URL.revokeObjectURL(url);
     setStatus('Downloaded!', 'valid');
   }
 
+  // --- Mode Toggle ---
+
+  function setMode(newMode) {
+    mode = newMode;
+    btnModeJSON.classList.toggle('active', mode === 'json');
+    btnModeXML.classList.toggle('active', mode === 'xml');
+    if (mode === 'xml' && isTreeView) {
+      isTreeView = false;
+      btnTreeView.classList.remove('primary');
+      jsonOutput.classList.remove('hidden');
+      treeOutput.classList.add('hidden');
+    }
+    setStatus('Switched to ' + mode.toUpperCase() + ' mode');
+  }
+
+  btnModeJSON.addEventListener('click', () => setMode('json'));
+  btnModeXML.addEventListener('click', () => setMode('xml'));
+
   // --- Event Listeners ---
 
-  btnFormat.addEventListener('click', formatJSON);
-  btnMinify.addEventListener('click', minifyJSON);
-  btnValidate.addEventListener('click', validateJSON);
+  btnFormat.addEventListener('click', formatInput);
+  btnMinify.addEventListener('click', minifyInput);
+  btnValidate.addEventListener('click', validateInput);
   btnTreeView.addEventListener('click', toggleTreeView);
 
   btnSample.addEventListener('click', () => {
-    input.value = JSON.stringify(sampleJSON, null, 2);
+    if (mode === 'xml') {
+      input.value = sampleXML;
+    } else {
+      input.value = JSON.stringify(sampleJSON, null, 2);
+    }
     updateLineNumbers();
     updateCharCount(inputCount, input.value);
-    formatJSON();
+    formatInput();
   });
 
   btnClear.addEventListener('click', () => {
@@ -404,7 +442,7 @@
     updateLineNumbers();
     updateCharCount(inputCount, '');
     updateCharCount(outputCount, '');
-    setStatus('Paste or type JSON in the input panel');
+    setStatus('Paste or type ' + mode.toUpperCase() + ' in the input panel');
   });
 
   btnCopy.addEventListener('click', copyOutput);
@@ -435,7 +473,7 @@
   document.addEventListener('keydown', (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
       e.preventDefault();
-      formatJSON();
+      formatInput();
     }
   });
 

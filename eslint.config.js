@@ -18,6 +18,9 @@ export default [
         console: 'readonly',
         module: 'readonly',
         JsonUtils: 'readonly',
+        XmlUtils: 'readonly',
+        DOMParser: 'readonly',
+        XMLSerializer: 'readonly',
       },
     },
     rules: {
